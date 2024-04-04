@@ -2,7 +2,15 @@ POST http://localhost:3333/events
 Content-Type: application/json
 
 {
-    "title":"Unite Sumit",
+    "title":"nnite Sumit",
     "details":"qualquer coisa",
     "maximumattendees":100
+}
+###
+POST http://localhost:3333/events/7d88dae3-ee64-487d-b659-7bb5d38846a1/attendee
+Content-Type: application/json
+
+{
+    "name":"Margarida Diamantino",
+    "email":"margaridadiamantino7@gmail.com"
 }
