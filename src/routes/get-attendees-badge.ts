@@ -3,35 +3,57 @@ import { ZodTypeProvider } from "fastify-type-provider-zod";
 import { request } from "http";
 import z from "zod";
 import { prisma } from "../lib/prisma";
+import { BadRequest } from "./_errors/bad-request";
 
 export async function getAttendee(app: FastifyInstance) {
     app.withTypeProvider<ZodTypeProvider>()
         .get("/attendees/:attendeeId/badge", {
             schema: {
+                summary: 'Get an attendee badge',
+                tags: ['attendees'],
                 params: z.object({
-                    attendeeId:z.coerce.number().int()
+                    attendeeId: z.coerce.number().int()
                 }),
-            response:{}
+                response: {
+                    200: z.object({
+                        badge: z.object({
+                            name: z.string(),
+                            email: z.string().email(),
+                            eventTitle: z.string(),
+                            checkInURL: z.string().url()
+                        })
+                    })
+                }
             }
-          }, async( request,reply)=>{
+        }, async (request, reply) => {
 
-            const {attendeeId}= request.params
-            const attendee= await prisma.attendee.findUnique({
-                select:{
-                    name:true,
-                    email:true,
-                   event:{
-                    select:{
-                        title:true
+            const { attendeeId } = request.params
+            const attendee = await prisma.attendee.findUnique({
+                select: {
+                    name: true,
+                    email: true,
+                    event: {
+                        select: {
+                            title: true
+                        }
                     }
-                   }
                 },
-                where:{id:attendeeId}
+                where: { id: attendeeId }
             })
-            if(attendee===null){
-                throw new Error("Attendee not found")
+            if (attendee === null) {
+                throw new BadRequest("Attendee not found")
             }
 
-            return reply.send({attendee})
-          })
-    }
+            const baseURL = `${request.protocol}://${request.hostname}`
+            const checkInURL = new URL(`/attendees/${attendeeId}/checkin`, baseURL)
+
+            return reply.send({
+                badge: {
+                    name: attendee.name,
+                    email: attendee.email,
+                    eventTitle: attendee.event.title,
+                    checkInURL: checkInURL.toString()
+                }
+            })
+        })
+}

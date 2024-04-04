@@ -4,11 +4,14 @@ import { generateSlug } from "../util/generateSlug";
 import { PrismaClient } from "@prisma/client";
 import { FastifyInstance } from "fastify";
 import { prisma } from "../lib/prisma";
+import { BadRequest } from "./_errors/bad-request";
 
 
 export async function creatEvent(app:FastifyInstance){
 app.withTypeProvider<ZodTypeProvider>().post("/events", {
     schema: {
+        summary: 'Create an event',
+        tags: ['events'],
         body: z.object({
             title: z.string().min(4),
             details: z.string(),
@@ -26,7 +29,7 @@ app.withTypeProvider<ZodTypeProvider>().post("/events", {
 
     const eventExists = await prisma.events.findUnique({ where: { slug } })
     if (eventExists !== null) {
-        throw new Error("error em criar o slug");
+        throw new BadRequest("error em criar o slug");
     }
     const event = await prisma.events.create({
         data: {

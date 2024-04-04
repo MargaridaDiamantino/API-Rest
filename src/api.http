@@ -2,20 +2,27 @@ POST http://localhost:3333/events
 Content-Type: application/json
 
 {
-    "title":"NLW 3",
+    "title":"NLW 123",
     "details":"qualquer coisa",
     "maximumattendees":1
 }
 ###
-POST http://localhost:3333/events/0c0ce9d6-9f88-4fc1-bf26-6ef281577be6/attendee
+POST http://localhost:3333/events/078a6f7f-864d-4071-b599-24d27d1d5865/attendee
 Content-Type: application/json
 
 {
     "name":"Margarida Diamantino",
-    "email":"margaridadiamantino9@gmail.com"
+    "email":"margaridadiamantino78@gmail.com"
 }
 ###
 GET http://localhost:3333/events/078a6f7f-864d-4071-b599-24d27d1d5865
 
 ###
 GET http://localhost:3333/attendees/6/badge
+
+###
+GET http://localhost:3333/attendees/7/check-in
+
+###
+GET http://localhost:3333/events/078a6f7f-864d-4071-b599-24d27d1d5865/attendees
+
