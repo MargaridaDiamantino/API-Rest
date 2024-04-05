@@ -1,5 +1,6 @@
 import fastify from "fastify";
 import { z } from "zod"
+import fastifyCors from "@fastify/cors";
 import { serializerCompiler, validatorCompiler, ZodTypeProvider,jsonSchemaTransform } from "fastify-type-provider-zod";
 import { PrismaClient } from "@prisma/client";
 import { generateSlug } from "./util/generateSlug";
@@ -12,8 +13,14 @@ import { checkIn } from "./routes/check-in";
 import { getEventAttendees } from "./routes/get-event-attendee";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUI from "@fastify/swagger-ui";
+import { errorHandler } from "./error-hadle";
 
-const app = fastify()
+const app = fastify().withTypeProvider<ZodTypeProvider>()
+
+app.register(fastifyCors, {
+  origin: '*',
+})
+
 
 app.register(fastifySwagger, {
     swagger: {
@@ -42,6 +49,8 @@ app.register(getAttendee)
 app.register(checkIn)
 
 app.register(getEventAttendees)
-app.listen({ port: 3333 }).then(() => {
-    console.log("hello world")
+
+app.setErrorHandler(errorHandler)
+app.listen({ port: 3333,host: '0.0.0.0' }).then(() => {
+    console.log('HTTP server running!')
 })
